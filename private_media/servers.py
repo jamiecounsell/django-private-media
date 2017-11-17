@@ -8,7 +8,7 @@ import os
 class NginxXAccelRedirectServer(object):
     def serve(self, request, path):
         response = HttpResponse()
-        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path)
+        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path.lstrip('/'))
         response['X-Accel-Redirect'] = fullpath
         response['Content-Type'] = mimetypes.guess_type(path)[0] or 'application/octet-stream'
         return response
@@ -16,7 +16,7 @@ class NginxXAccelRedirectServer(object):
 
 class ApacheXSendfileServer(object):
     def serve(self, request, path):
-        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path)
+        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path.lstrip('/'))
         response = HttpResponse()
         response['X-Sendfile'] = fullpath
 
