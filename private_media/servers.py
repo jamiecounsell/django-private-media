@@ -8,17 +8,25 @@ import os
 class NginxXAccelRedirectServer(object):
     def serve(self, request, path):
         response = HttpResponse()
-        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path)
-        response['X-Accel-Redirect'] = fullpath
+        if hasattr(settings, 'PRIVATE_SENDFILE_ROOT'):
+            root = settings.PRIVATE_SENDFILE_ROOT
+        else:
+            root = settings.PRIVATE_MEDIA_ROOT
+
+        response['X-Accel-Redirect'] = os.path.join(root, path)
         response['Content-Type'] = mimetypes.guess_type(path)[0] or 'application/octet-stream'
         return response
 
 
 class ApacheXSendfileServer(object):
     def serve(self, request, path):
-        fullpath = os.path.join(settings.PRIVATE_MEDIA_ROOT, path)
         response = HttpResponse()
-        response['X-Sendfile'] = fullpath
+        if hasattr(settings, 'PRIVATE_SENDFILE_ROOT'):
+            root = settings.PRIVATE_SENDFILE_ROOT
+        else:
+            root = settings.PRIVATE_MEDIA_ROOT
+
+        response['X-Sendfile'] = os.path.join(root, path)
 
         # From django-filer (https://github.com/stefanfoulis/django-filer/):
         # This is needed for lighttpd, hopefully this will
